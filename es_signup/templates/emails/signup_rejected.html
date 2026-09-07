@@ -1,0 +1,13 @@
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1f272e;">
+	<p>Hi {{ full_name }},</p>
+
+	<p>We've reviewed your account request and can't set one up at this stage.</p>
+
+	{% if reason %}
+	<blockquote style="margin:16px 0;padding:8px 14px;border-left:3px solid #d1d8dd;color:#36414c;">{{ reason }}</blockquote>
+	{% endif %}
+
+	{% if contact_email %}
+	<p>If you think that's a mistake, reply to <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> and we'll take another look.</p>
+	{% endif %}
+</div>

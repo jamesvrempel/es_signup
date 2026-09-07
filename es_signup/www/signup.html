@@ -1,0 +1,150 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Request an account") }}{% endblock %}
+
+{% block page_content %}
+<div class="es-signup">
+	{% if not enabled %}
+		<h1>{{ _("Sign-up is closed") }}</h1>
+		<p class="text-muted">
+			{{ _("This site isn't accepting new account requests right now.") }}
+			{% if support_email %}
+				{{ _("Email") }} <a href="mailto:{{ support_email }}">{{ support_email }}</a>{{ _(" if you need access.") }}
+			{% endif %}
+		</p>
+	{% else %}
+		<h1>{{ _("Request an account") }}</h1>
+
+		{% if form_intro %}
+			<div class="es-signup-intro text-muted">{{ form_intro }}</div>
+		{% else %}
+			<p class="text-muted">
+				{{ _("Tell us who you are and we'll review your request. You'll get an email with a link to set your password once it's approved.") }}
+			</p>
+		{% endif %}
+
+		<div id="es-signup-alert" class="alert" style="display:none" role="alert"></div>
+
+		<div id="es-signup-form">
+			<div class="row">
+				<div class="col-sm-6 mb-3">
+					<label class="form-label" for="first_name">{{ _("First name") }}</label>
+					<input type="text" id="first_name" class="form-control" required autocomplete="given-name">
+				</div>
+				<div class="col-sm-6 mb-3">
+					<label class="form-label" for="last_name">{{ _("Last name") }}</label>
+					<input type="text" id="last_name" class="form-control" autocomplete="family-name">
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label" for="email">{{ _("Work email") }}</label>
+				<input type="email" id="email" class="form-control" required autocomplete="email">
+			</div>
+
+			<div class="row">
+				<div class="col-sm-6 mb-3">
+					<label class="form-label" for="company_name">{{ _("Company") }}</label>
+					<input type="text" id="company_name" class="form-control" autocomplete="organization">
+				</div>
+				<div class="col-sm-6 mb-3">
+					<label class="form-label" for="mobile_no">{{ _("Phone") }}</label>
+					<input type="tel" id="mobile_no" class="form-control" autocomplete="tel">
+				</div>
+			</div>
+
+			{% if allow_system_user_requests %}
+			<div class="mb-3">
+				<label class="form-label" for="account_type">{{ _("What kind of access do you need?") }}</label>
+				<select id="account_type" class="form-control form-select">
+					<option value="Customer">{{ _("Customer portal — orders, invoices and support") }}</option>
+					<option value="System User">{{ _("Staff — full access to ES ERP") }}</option>
+				</select>
+			</div>
+			{% endif %}
+
+			<div class="mb-3">
+				<label class="form-label" for="reason">{{ _("Why do you need access?") }}</label>
+				<textarea id="reason" class="form-control" rows="3"></textarea>
+			</div>
+
+			<div class="es-signup-hp" aria-hidden="true">
+				<label for="website">{{ _("Website") }}</label>
+				<input type="text" id="website" tabindex="-1" autocomplete="off">
+			</div>
+
+			<button id="es-signup-submit" class="btn btn-primary">{{ _("Send request") }}</button>
+			<a href="/login" class="btn btn-link">{{ _("I already have an account") }}</a>
+		</div>
+	{% endif %}
+</div>
+
+<style>
+	.es-signup { max-width: 40rem; margin-bottom: 4rem; }
+	.es-signup h1 { margin-bottom: .75rem; }
+	.es-signup-intro { margin-bottom: 1.5rem; }
+	.es-signup .form-label { font-weight: 500; }
+	.es-signup-hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
+	#es-signup-alert { margin-bottom: 1.25rem; }
+</style>
+
+<script>
+frappe.ready(function () {
+	const button = document.getElementById("es-signup-submit");
+	if (!button) return;
+
+	const alertBox = document.getElementById("es-signup-alert");
+
+	function show(message, kind) {
+		alertBox.className = "alert alert-" + kind;
+		alertBox.innerHTML = message;
+		alertBox.style.display = "block";
+		alertBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+	}
+
+	function value(id) {
+		const el = document.getElementById(id);
+		return el ? el.value.trim() : "";
+	}
+
+	button.addEventListener("click", function () {
+		if (!value("first_name") || !value("email")) {
+			show("{{ _('Enter your name and email so we know who is asking.') }}", "warning");
+			return;
+		}
+
+		button.disabled = true;
+		button.textContent = "{{ _('Sending…') }}";
+
+		frappe.call({
+			method: "es_signup.api.submit_signup_request",
+			type: "POST",
+			args: {
+				first_name: value("first_name"),
+				last_name: value("last_name"),
+				email: value("email"),
+				company_name: value("company_name"),
+				mobile_no: value("mobile_no"),
+				account_type: value("account_type") || "Customer",
+				reason: value("reason"),
+				website: value("website"),
+				source_page: window.location.pathname
+			},
+			callback: function (r) {
+				if (r.message && r.message.ok) {
+					document.getElementById("es-signup-form").style.display = "none";
+					show(r.message.message, "success");
+				} else {
+					button.disabled = false;
+					button.textContent = "{{ _('Send request') }}";
+				}
+			},
+			error: function () {
+				button.disabled = false;
+				button.textContent = "{{ _('Send request') }}";
+			}
+		});
+	});
+});
+</script>
+{% endblock %}

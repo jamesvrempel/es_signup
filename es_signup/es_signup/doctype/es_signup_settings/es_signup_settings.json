@@ -1,0 +1,194 @@
+{
+ "actions": [],
+ "creation": "2026-09-07 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enable_signup",
+   "fieldtype": "Check",
+   "label": "Enable Sign-Up Requests"
+  },
+  {
+   "default": "1",
+   "fieldname": "override_login_signup",
+   "fieldtype": "Check",
+   "label": "Route /login#signup Through Approval",
+   "description": "Intercepts Frappe's built-in sign-up so it raises an approval request instead of creating the account immediately."
+  },
+  {
+   "fieldname": "approver_section",
+   "fieldtype": "Section Break",
+   "label": "Approval"
+  },
+  {
+   "fieldname": "approver_emails",
+   "fieldtype": "Small Text",
+   "label": "Approver Emails",
+   "description": "One address per line. All listed addresses receive the request; the first to action it wins.",
+   "reqd": 1
+  },
+  {
+   "default": "168",
+   "fieldname": "token_validity_hours",
+   "fieldtype": "Int",
+   "label": "Email Link Validity (Hours)"
+  },
+  {
+   "fieldname": "column_break_approval",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_applicant_on_rejection",
+   "fieldtype": "Check",
+   "label": "Email Applicant When Rejected"
+  },
+  {
+   "fieldname": "support_email",
+   "fieldtype": "Data",
+   "label": "Reply-To / Support Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "roles_section",
+   "fieldtype": "Section Break",
+   "label": "Roles Granted on Approval"
+  },
+  {
+   "fieldname": "website_user_roles",
+   "fieldtype": "Table",
+   "label": "Customer (Website User) Roles",
+   "options": "ES Signup Role"
+  },
+  {
+   "fieldname": "column_break_roles",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "system_user_roles",
+   "fieldtype": "Table",
+   "label": "System User Roles",
+   "options": "ES Signup Role",
+   "description": "System Users consume a licensed seat. Keep this list deliberately narrow."
+  },
+  {
+   "fieldname": "customer_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Records"
+  },
+  {
+   "default": "1",
+   "fieldname": "create_customer_record",
+   "fieldtype": "Check",
+   "label": "Create Customer and Contact for Customer Sign-Ups"
+  },
+  {
+   "depends_on": "create_customer_record",
+   "fieldname": "default_customer_group",
+   "fieldtype": "Link",
+   "label": "Default Customer Group",
+   "options": "Customer Group"
+  },
+  {
+   "fieldname": "column_break_customer",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "create_customer_record",
+   "fieldname": "default_territory",
+   "fieldtype": "Link",
+   "label": "Default Territory",
+   "options": "Territory"
+  },
+  {
+   "fieldname": "gate_section",
+   "fieldtype": "Section Break",
+   "label": "Who Can Apply",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "allowed_domains",
+   "fieldtype": "Small Text",
+   "label": "Allowed Email Domains",
+   "description": "One per line. Leave blank to accept any domain."
+  },
+  {
+   "fieldname": "column_break_gate",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "blocked_domains",
+   "fieldtype": "Small Text",
+   "label": "Blocked Email Domains",
+   "description": "One per line. Useful for disposable-mail providers."
+  },
+  {
+   "fieldname": "messaging_section",
+   "fieldtype": "Section Break",
+   "label": "Welcome Email"
+  },
+  {
+   "fieldname": "welcome_subject",
+   "fieldtype": "Data",
+   "label": "Welcome Email Subject",
+   "default": "Your ES ERP account is ready"
+  },
+  {
+   "fieldname": "welcome_message",
+   "fieldtype": "Text Editor",
+   "label": "Welcome Email Intro"
+  },
+  {
+   "fieldname": "form_section",
+   "fieldtype": "Section Break",
+   "label": "Sign-Up Form"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_system_user_requests",
+   "fieldtype": "Check",
+   "label": "Offer \"Staff / System User\" on the Public Form"
+  },
+  {
+   "fieldname": "form_intro",
+   "fieldtype": "Text Editor",
+   "label": "Form Introduction"
+  },
+  {
+   "fieldname": "column_break_form",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "success_message",
+   "fieldtype": "Text Editor",
+   "label": "Message Shown After Submitting"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-07 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ES Signup",
+ "name": "ES Signup Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

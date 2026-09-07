@@ -1,0 +1,100 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Review access request") }}{% endblock %}
+
+{% block page_content %}
+<div class="es-action">
+	{% if error or not doc %}
+		<h1>{{ _("Nothing to do here") }}</h1>
+		<p class="text-muted">{{ error or _("That link is missing something. Open the request in ES ERP instead.") }}</p>
+		<a class="btn btn-secondary" href="/app/es-signup-request">{{ _("Open the request list") }}</a>
+	{% else %}
+		<h1>
+			{% if action == "approve" %}{{ _("Approve this request?") }}{% else %}{{ _("Reject this request?") }}{% endif %}
+		</h1>
+
+		<dl class="es-action-detail">
+			<dt>{{ _("Name") }}</dt><dd>{{ full_name }}</dd>
+			<dt>{{ _("Email") }}</dt><dd>{{ doc.email }}</dd>
+			{% if doc.company_name %}<dt>{{ _("Company") }}</dt><dd>{{ doc.company_name }}</dd>{% endif %}
+			<dt>{{ _("Account type") }}</dt><dd>{{ doc.account_type }}</dd>
+			{% if doc.reason %}<dt>{{ _("Reason") }}</dt><dd>{{ doc.reason }}</dd>{% endif %}
+			<dt>{{ _("Requested") }}</dt><dd>{{ frappe.utils.format_datetime(doc.creation) }}</dd>
+		</dl>
+
+		{% if action == "approve" %}
+			<p class="text-muted">
+				{% if doc.account_type == "System User" %}
+					{{ _("This creates a System User, which uses a licensed seat.") }}
+				{% else %}
+					{{ _("This creates a portal account and emails a link to set a password.") }}
+				{% endif %}
+			</p>
+		{% else %}
+			<div class="mb-3">
+				<label class="form-label" for="reason">{{ _("Reason (sent to the applicant)") }}</label>
+				<textarea id="reason" class="form-control" rows="3"></textarea>
+			</div>
+		{% endif %}
+
+		<div id="es-action-result" class="alert" style="display:none" role="alert"></div>
+
+		<div id="es-action-buttons">
+			<button id="es-action-confirm" class="btn {% if action == 'approve' %}btn-primary{% else %}btn-danger{% endif %}">
+				{% if action == "approve" %}{{ _("Approve and create account") }}{% else %}{{ _("Reject request") }}{% endif %}
+			</button>
+			<a class="btn btn-link" href="/app/es-signup-request/{{ doc.name }}">{{ _("Open in ES ERP instead") }}</a>
+		</div>
+	{% endif %}
+</div>
+
+<style>
+	.es-action { max-width: 36rem; margin-bottom: 4rem; }
+	.es-action-detail { display: grid; grid-template-columns: 9rem 1fr; gap: .4rem 1rem; margin: 1.5rem 0; }
+	.es-action-detail dt { font-weight: 500; color: var(--text-muted); }
+	.es-action-detail dd { margin: 0; }
+	@media (max-width: 480px) { .es-action-detail { grid-template-columns: 1fr; gap: 0 0; } .es-action-detail dd { margin-bottom: .75rem; } }
+</style>
+
+<script>
+frappe.ready(function () {
+	const button = document.getElementById("es-action-confirm");
+	if (!button) return;
+
+	button.addEventListener("click", function () {
+		button.disabled = true;
+		const original = button.textContent;
+		button.textContent = "{{ _('Working…') }}";
+
+		const reasonEl = document.getElementById("reason");
+
+		frappe.call({
+			method: "es_signup.api.process_email_action",
+			type: "POST",
+			args: {
+				name: {{ doc.name | tojson }},
+				token: {{ token | tojson }},
+				action: {{ action | tojson }},
+				reason: reasonEl ? reasonEl.value : null
+			},
+			callback: function (r) {
+				const box = document.getElementById("es-action-result");
+				if (r.message && r.message.ok) {
+					document.getElementById("es-action-buttons").style.display = "none";
+					box.className = "alert alert-success";
+					box.textContent = r.message.message;
+					box.style.display = "block";
+				} else {
+					button.disabled = false;
+					button.textContent = original;
+				}
+			},
+			error: function () {
+				button.disabled = false;
+				button.textContent = original;
+			}
+		});
+	});
+});
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+<div class="page-card-body es-signup-handoff">
+	<p class="text-muted">
+		{{ _("Accounts on this site are reviewed before they're created, so there are a few more details to fill in.") }}
+	</p>
+</div>
+<div class="page-card-actions">
+	<a href="/signup" class="btn btn-sm btn-primary btn-block">{{ _("Request an account") }}</a>
+	<p class="text-center sign-up-message">
+		<a href="#login" class="blue">{{ _("Have an account? Login") }}</a>
+	</p>
+</div>
+
+<script>
+(function () {
+	var TARGET = "/signup";
+
+	// Someone arrived on /login#signup directly — send them straight through.
+	if (window.location.hash === "#signup") {
+		window.location.replace(TARGET);
+		return;
+	}
+
+	function repointSignupLinks() {
+		var links = document.querySelectorAll('a[href="#signup"]');
+		for (var i = 0; i < links.length; i++) {
+			links[i].setAttribute("href", TARGET);
+		}
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", repointSignupLinks);
+	} else {
+		repointSignupLinks();
+	}
+
+	// Covers the back button and any link added after load.
+	window.addEventListener("hashchange", function () {
+		if (window.location.hash === "#signup") {
+			window.location.replace(TARGET);
+		}
+	});
+})();
+</script>

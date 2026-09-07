@@ -1,0 +1,22 @@
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1f272e;">
+	<p>Hi {{ full_name }},</p>
+
+	{% if intro %}
+		{{ intro }}
+	{% else %}
+		<p>Your account has been approved. Set a password to get started.</p>
+	{% endif %}
+
+	<p style="margin:24px 0;">
+		<a href="{{ reset_link }}" style="display:inline-block;padding:11px 20px;background:#2490ef;color:#fff;text-decoration:none;border-radius:6px;">Set your password</a>
+	</p>
+
+	<p style="color:#6b757d;font-size:13px;">
+		If the button doesn't work, copy this link into your browser:<br>
+		<span style="word-break:break-all;">{{ reset_link }}</span>
+	</p>
+
+	<p style="color:#6b757d;font-size:13px;">
+		After that you can sign in any time at <a href="{{ login_url }}">{{ login_url }}</a>.
+	</p>
+</div>

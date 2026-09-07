@@ -1,0 +1,14 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include es_signup *.css
+recursive-include es_signup *.html
+recursive-include es_signup *.js
+recursive-include es_signup *.json
+recursive-include es_signup *.md
+recursive-include es_signup *.py
+recursive-include es_signup *.txt
+recursive-exclude es_signup *.pyc
